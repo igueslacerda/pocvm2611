@@ -1,6 +1,28 @@
 @pocservicedn_HostAddress = http://localhost:5228
+@accessToken = substitua-pelo-token-retornado-no-login
 
-GET {{pocservicedn_HostAddress}}/weatherforecast/
+### Login (anônimo)
+POST {{pocservicedn_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "login": "usuario",
+  "senha": "senha-atual",
+  "origem": "Web"
+}
+
+### Consultar usuário e pessoa relacionada (JWT obrigatório)
+GET {{pocservicedn_HostAddress}}/api/auth/me
+Authorization: Bearer {{accessToken}}
 Accept: application/json
 
-###
+### Alterar senha (JWT obrigatório)
+PATCH {{pocservicedn_HostAddress}}/api/auth/password
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "login": "usuario",
+  "senhaAtual": "senha-atual",
+  "novaSenha": "nova-senha-segura"
+}
