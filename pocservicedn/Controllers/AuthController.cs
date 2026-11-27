@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using pocservicedn.Attributes;
 using pocservicedn.Contracts;
 using pocservicedn.Middleware;
 using pocservicedn.Services;
@@ -9,6 +8,7 @@ namespace pocservicedn.Controllers;
 
 [ApiController]
 [Route("api/auth")]
+[Authorize]
 public sealed class AuthController(IAuthenticationService authenticationService) : ControllerBase
 {
     [AllowAnonymous]
@@ -29,7 +29,6 @@ public sealed class AuthController(IAuthenticationService authenticationService)
             : Ok(response);
     }
 
-    [AuthenticatedUser]
     [HttpPatch("senha")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -58,7 +57,6 @@ public sealed class AuthController(IAuthenticationService authenticationService)
         };
     }
 
-    [AuthenticatedUser]
     [HttpGet("perfil")]
     [ProducesResponseType<UserProfileResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

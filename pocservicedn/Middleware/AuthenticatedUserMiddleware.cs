@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using pocservicedn.Attributes;
 
 namespace pocservicedn.Middleware;
 
@@ -9,7 +9,9 @@ public sealed class AuthenticatedUserMiddleware(RequestDelegate next)
 {
     public async Task InvokeAsync(HttpContext context)
     {
-        var requiresUserId = context.GetEndpoint()?.Metadata.GetMetadata<AuthenticatedUserAttribute>() is not null;
+        var endpoint = context.GetEndpoint();
+        var requiresUserId = endpoint?.Metadata.GetMetadata<IAuthorizeData>() is not null &&
+            endpoint.Metadata.GetMetadata<IAllowAnonymous>() is null;
         if (!requiresUserId)
         {
             await next(context);
