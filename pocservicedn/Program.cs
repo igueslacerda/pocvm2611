@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text.Json.Serialization;
 using pocservicedn.Data;
 using pocservicedn.Entities;
+using pocservicedn.Middleware;
 using pocservicedn.Repositories;
 using Scalar.AspNetCore;
 using pocservicedn.Services;
@@ -72,7 +73,9 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 app.UseHttpsRedirection();
+app.UseRouting();
 app.UseAuthentication();
+app.UseMiddleware<AuthenticatedUserMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 

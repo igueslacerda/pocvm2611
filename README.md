@@ -41,4 +41,6 @@ As entidades representam somente as colunas de suas tabelas, sem propriedades de
 
 O login recebe `login`, `senha` e `origem` (`Web` ou `Mobile`). Em caso de sucesso, grava um registro em `ac_log` usando `AcLogAcaoEnum.Login` (`1`) e os códigos de origem (`Web=1`, `Mobile=2`); a data é preenchida pelo default do banco. A troca de senha recebe `login`, `senhaAtual` e `novaSenha`; o login informado deve corresponder ao usuário do token. O endpoint `me` retorna os dados do usuário autenticado e da pessoa relacionada.
 
+Os endpoints protegidos usam o atributo `[AuthenticatedUser]`. O middleware valida o JWT e o identificador do usuário, disponibilizando o `userId` no contexto HTTP para o controller.
+
 Use `pocservicedn/pocservicedn.http` como exemplos de chamadas. Em desenvolvimento, o documento OpenAPI está disponível em `/openapi/v1.json`. A interface Scalar fica disponível em `/scalar/v1` apenas quando a aplicação é executada em `Development` usando a configuração `Debug`; ela não é incluída em builds `Release`.

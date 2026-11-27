@@ -1,7 +1,8 @@
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using pocservicedn.Attributes;
 using pocservicedn.Contracts;
+using pocservicedn.Middleware;
 using pocservicedn.Services;
 
 namespace pocservicedn.Controllers;
@@ -28,22 +29,21 @@ public sealed class AuthController(IAuthenticationService authenticationService)
             : Ok(response);
     }
 
-    [Authorize]
+    [AuthenticatedUser]
     [HttpPatch("senha")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> ChangePassword(
         [FromBody] ChangePasswordRequest request,
         CancellationToken cancellationToken)
     {
-        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
-        {
-            return Unauthorized();
-        }
-
-        var result = await authenticationService.ChangePasswordAsync(userId, request, cancellationToken);
+        var result = await authenticationService.ChangePasswordAsync(
+            HttpContext.GetAuthenticatedUserId(),
+            request,
+            cancellationToken);
         return result switch
         {
             ChangePasswordResult.Success => NoContent(),
@@ -58,18 +58,16 @@ public sealed class AuthController(IAuthenticationService authenticationService)
         };
     }
 
-    [Authorize]
+    [AuthenticatedUser]
     [HttpGet("perfil")]
     [ProducesResponseType<UserProfileResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<UserProfileResponse>> GetMyProfile(CancellationToken cancellationToken)
     {
-        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
-        {
-            return Unauthorized();
-        }
-
-        var profile = await authenticationService.ObterPerfilAsync(userId, cancellationToken);
+        var profile = await authenticationService.ObterPerfilAsync(
+            HttpContext.GetAuthenticatedUserId(),
+            cancellationToken);
         return profile is null ? NotFound() : Ok(profile);
     }
 }
